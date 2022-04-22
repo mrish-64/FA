@@ -1,6 +1,7 @@
 import numpy
 import math
-import benchmarks as Fit    
+import benchmarks as Fit  
+from functions import f 
 import matplotlib.pyplot as plt  
 
 def alpha_new(alpha,NGen):
@@ -12,10 +13,10 @@ def alpha_new(alpha,NGen):
 
 
 # General parameters
-lb=-10;    
-ub=10;
+lb=0;    
+ub=1;
 MaxGeneration=1000;
-dim=30;
+dim=40;
 n=50;
 
 #FFA parameters
@@ -30,9 +31,9 @@ if not isinstance(ub, list):
 zn=numpy.ones(n)
 zn.fill(float("inf")) 
     
-ns = numpy.zeros((n, dim))
+ns = numpy.zeros((n, dim)).astype(int)
 for i in range(dim):
-   ns[:, i] = numpy.random.uniform(0,1, n) * (ub[i] - lb[i]) + lb[i]
+   ns[:, i] =numpy.random.randint(2,size=n)
 Lightn=numpy.ones(n)
 Lightn.fill(float("inf")) 
     
@@ -46,7 +47,7 @@ for k in range (0,MaxGeneration):     # start iterations
         
  #% Evaluate new solutions (for all n fireflies)
  for i in range(0,n):
-   zn[i]=Fit.F1(ns[i,:])
+   zn[i]=f(ns[i,:])
    Lightn[i]=zn[i]
         
         
@@ -82,8 +83,11 @@ for k in range (0,MaxGeneration):     # start iterations
          beta0=1
          beta=(beta0-betamin)*math.exp(-gamma*r**2)+betamin
          tmpf=alpha*(numpy.random.rand(dim)-0.5)*scale
-         ns[i,:]=ns[i,:]*(1-beta)+nso[j,:]*beta+tmpf
-        
+         tmp_ns=ns[i,:].astype(float)
+         tmp_ns=tmp_ns*(1-beta)+nso[j,:]*beta+tmpf
+         sigV=1/(1+(numpy.exp((-tmp_ns))))
+         ns[i,:] =( sigV > numpy.random.rand(ns[i,:].size)).astype(int)
+         
         
         
  convergence.append(fbest)
